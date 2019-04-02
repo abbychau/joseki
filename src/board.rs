@@ -16,8 +16,8 @@ impl Stone {
     fn char(&self) -> char {
         match *self {
             Stone::Empty => '⋅', // U+22C5 DOT OPERATOR
-            Stone::Black => '●', // U+25CF BLACK CIRCLE
-            Stone::White => '○', // U+25CB WHITE CIRCLE
+            Stone::Black => '🔵', // U+25CF BLACK CIRCLE
+            Stone::White => '🔴', // U+25CB WHITE CIRCLE
         }
     }
 

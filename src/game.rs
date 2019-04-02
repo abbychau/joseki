@@ -78,6 +78,8 @@ impl Game {
                     // Use `Game::make_move` to take into account captures.
                     let (x, y) = Self::alpha_to_xy(&val);
                     game.make_move(stone, x, y);
+println!("{}\n{}/{}",game.board, properties.len()-2);
+            ::std::thread::sleep(::std::time::Duration::from_secs(1));
                 },
                 SGF::AddStone(stone) => {
                     // Manually assign stone to position.
@@ -99,6 +101,7 @@ impl Game {
                 }
                 _ => {},
             }
+            
         }
 
         game

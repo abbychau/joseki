@@ -84,7 +84,7 @@ impl Game {
         println!("\n\n\n\n\n");
         println!("\n\n");
         
-        println!("({})\n",move_count);
+        // println!("({})\n",move_count);
         
         for (prop, val) in properties {
 

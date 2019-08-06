@@ -5,7 +5,7 @@ use std::path::Path;
 
 use regex::Regex;
 
-use board::{Board, Stone};
+use crate::board::{Board, Stone};
 use crossterm::cursor;
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -45,6 +45,7 @@ impl Game {
         let mut game = Game::new();
 
         // Enum containing various SGF properties
+        #[derive(Debug)]
         enum SGF {
             AddStone(Stone),
             Move(Stone),
@@ -56,10 +57,10 @@ impl Game {
         // TODO: Write an actual SGF parser instead of naively using regexes
         let re = Regex::new(r"(\w{1,2})\[(.+?)\]").expect("invalid regex");
         
-        let mut move_count = 0;
+        let mut move_count : i32 = 0;
 
         // Parse captured regex matches into SGF properties
-        let properties = re.captures_iter(&contents).map(|cap| {
+        let properties : Vec<(SGF,String)> = re.captures_iter(&contents).map(|cap| {
             let property = match &cap[1] {
                 "B"  => {move_count+=1; SGF::Move(Stone::Black)},
                 "W"  => {move_count+=1; SGF::Move(Stone::White)},
@@ -73,19 +74,19 @@ impl Game {
             };
 
             (property, cap[2].to_string())
-        });
+        }).collect();
 
-
+        // println!("{:?}",properties);
 
         let mut cursor = cursor();
         println!("\n\n\n\n\n");
         println!("\n\n\n\n\n");
         println!("\n\n\n\n\n");
         println!("\n\n\n\n\n");
-        println!("\n\n");
-        
-        // println!("({})\n",move_count);
-        
+        println!("\n\n\n\n\n");
+                    ::std::thread::sleep(::std::time::Duration::from_millis(100));
+
+        let mut cur_move = 0;
         for (prop, val) in properties {
 
             cursor.move_up(20);
@@ -96,9 +97,10 @@ impl Game {
                     // Use `Game::make_move` to take into account captures.
                     let (x, y) = Self::alpha_to_xy(&val);
                     game.make_move(stone, x, y);
-                    println!("{}\n",game.board);
+                    cur_move +=1;
+                    println!("{}\n {}/{} ({:.3}%)",game.board,cur_move,move_count,   (cur_move*100) as f64/move_count as f64);
                     
-                    ::std::thread::sleep(::std::time::Duration::from_millis(1000));
+                    ::std::thread::sleep(::std::time::Duration::from_millis(100));
                 },
                 SGF::AddStone(stone) => {
                     // Manually assign stone to position.
@@ -124,9 +126,10 @@ impl Game {
             }
             
         }
-
         game
     }
+
+    
 
     /// Places `stone` at `(x, y)`, returning true if it was successful (respecting the ko rule).
     pub fn make_move(&mut self, stone: Stone, x: usize, y: usize) -> bool {
@@ -174,7 +177,7 @@ impl fmt::Display for Game {
 #[cfg(test)]
 mod tests {
     use super::Game;
-    use board::{Board, Stone};
+    use crate::board::{Board, Stone};
 
     #[test]
     fn new_game() {

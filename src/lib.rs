@@ -6,4 +6,4 @@ extern crate crossterm;
 mod board;
 mod game;
 
-pub use game::Game;
+pub use crate::game::Game;

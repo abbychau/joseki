@@ -8,6 +8,7 @@ homepage = "https://github.com/iKevinY/joseki"
 repository = "https://github.com/iKevinY/joseki"
 readme = "README.md"
 license = "MIT"
+edition = "2018"
 
 [badges]
 travis-ci = { repository = "iKevinY/joseki" }
@@ -23,3 +24,4 @@ path = "src/lib.rs"
 
 [dependencies]
 regex = "0.2"
+crossterm = "*"

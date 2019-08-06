@@ -6,6 +6,7 @@ use std::path::Path;
 use regex::Regex;
 
 use board::{Board, Stone};
+use crossterm::cursor;
 
 #[derive(Clone, Debug, Default, PartialEq)]
 struct Player {
@@ -54,12 +55,14 @@ impl Game {
 
         // TODO: Write an actual SGF parser instead of naively using regexes
         let re = Regex::new(r"(\w{1,2})\[(.+?)\]").expect("invalid regex");
+        
+        let mut move_count = 0;
 
         // Parse captured regex matches into SGF properties
         let properties = re.captures_iter(&contents).map(|cap| {
             let property = match &cap[1] {
-                "B"  => SGF::Move(Stone::Black),
-                "W"  => SGF::Move(Stone::White),
+                "B"  => {move_count+=1; SGF::Move(Stone::Black)},
+                "W"  => {move_count+=1; SGF::Move(Stone::White)},
                 "AB" => SGF::AddStone(Stone::Black),
                 "AW" => SGF::AddStone(Stone::White),
                 "PB" => SGF::PlayerName(Stone::Black),
@@ -72,14 +75,30 @@ impl Game {
             (property, cap[2].to_string())
         });
 
+
+
+        let mut cursor = cursor();
+        println!("\n\n\n\n\n");
+        println!("\n\n\n\n\n");
+        println!("\n\n\n\n\n");
+        println!("\n\n\n\n\n");
+        println!("\n\n");
+        
+        println!("({})\n",move_count);
+        
         for (prop, val) in properties {
+
+            cursor.move_up(20);
+            cursor.move_left(19);
+
             match prop {
                 SGF::Move(stone) => {
                     // Use `Game::make_move` to take into account captures.
                     let (x, y) = Self::alpha_to_xy(&val);
                     game.make_move(stone, x, y);
-println!("{}\n{}/{}",game.board, properties.len()-2);
-            ::std::thread::sleep(::std::time::Duration::from_secs(1));
+                    println!("{}\n",game.board);
+                    
+                    ::std::thread::sleep(::std::time::Duration::from_millis(1000));
                 },
                 SGF::AddStone(stone) => {
                     // Manually assign stone to position.
@@ -87,9 +106,11 @@ println!("{}\n{}/{}",game.board, properties.len()-2);
                 },
                 SGF::PlayerName(stone) => {
                     if stone == Stone::Black {
-                        game.black.name = Some(val);
+                        game.black.name = Some(val.clone());
+                        println!("Black: {}\n",val);
                     } else {
-                        game.white.name = Some(val);
+                        game.white.name = Some(val.clone());
+                        println!("White: {}\n",val);
                     }
                 },
                 SGF::PlayerRank(stone) => {
@@ -137,7 +158,6 @@ println!("{}\n{}/{}",game.board, properties.len()-2);
         (x as usize - b'a' as usize, y as usize - b'a' as usize)
     }
 }
-
 impl fmt::Display for Game {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let unknown = String::from("<unknown>");
